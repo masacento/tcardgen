@@ -12,10 +12,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/Ladicle/tcardgen/pkg/canvas"
-	"github.com/Ladicle/tcardgen/pkg/canvas/fontfamily"
-	"github.com/Ladicle/tcardgen/pkg/config"
-	"github.com/Ladicle/tcardgen/pkg/hugo"
+	"github.com/masacento/tcardgen/pkg/canvas"
+	"github.com/masacento/tcardgen/pkg/canvas/fontfamily"
+	"github.com/masacento/tcardgen/pkg/config"
+	"github.com/masacento/tcardgen/pkg/hugo"
+	"github.com/masacento/tcardgen/pkg/png"
 )
 
 const (
@@ -197,7 +198,7 @@ func generateTCard(streams IOStreams, contentPath, outPath string, tpl image.Ima
 		return err
 	}
 	if err := c.DrawTextAtPoint(
-		fmt.Sprintf("%s%s%s", fm.Author, cnf.Info.Separator, fm.Date.Format(cnf.Info.TimeFormat)),
+		fmt.Sprintf("%s", fm.Date.Format(cnf.Info.TimeFormat)),
 		*cnf.Info.Start,
 		canvas.FgHexColor(cnf.Info.FgHexColor),
 		canvas.FontFaceFromFFA(ffa, cnf.Info.FontStyle, cnf.Info.FontSize),
@@ -217,5 +218,9 @@ func generateTCard(streams IOStreams, contentPath, outPath string, tpl image.Ima
 		return err
 	}
 
-	return c.SaveAsPNG(outPath)
+	err = c.SaveAsPNG(outPath)
+	if err != nil {
+		return err
+	}
+	return png.Optimize(outPath, outPath, 16)
 }
